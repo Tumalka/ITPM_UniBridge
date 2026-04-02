@@ -33,6 +33,12 @@ MONGODB_URI=mongodb+srv://your-username:your-password@cluster0.xxxxx.mongodb.net
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 ```
 
+3. (Optional) Add Google OAuth credentials if you want to enable social login:
+```env
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
+
 ### 3. Install Dependencies
 ```bash
 npm install

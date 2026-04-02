@@ -3,14 +3,20 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// Configure Google Strategy
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/api/auth/google/callback',
-    },
+const googleClientID = process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+const googleAuthEnabled = Boolean(googleClientID && googleClientSecret);
+
+if (googleAuthEnabled) {
+  // Configure Google Strategy
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: googleClientID,
+        clientSecret: googleClientSecret,
+        callbackURL: '/api/auth/google/callback',
+      },
     async (accessToken, refreshToken, profile, done) => {
       try {
         // Check if user already exists
@@ -56,7 +62,10 @@ passport.use(
       }
     }
   )
-);
+  );
+} else {
+  console.warn('Google OAuth is disabled. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Backend/.env to enable it.');
+}
 
 // Serialize user for session
 passport.serializeUser((user, done) => {
@@ -119,4 +128,5 @@ module.exports = {
   passport,
   googleCallback,
   getMe,
+  googleAuthEnabled,
 };

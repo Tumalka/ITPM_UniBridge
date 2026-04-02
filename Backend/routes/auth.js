@@ -1,6 +1,6 @@
 const express = require('express');
 const { register, login, getMe, changePassword, forgotPassword, resetPassword, verifyOTP } = require('../controllers/authController');
-const { passport, googleCallback } = require('../controllers/googleAuthController');
+const { passport, googleCallback, googleAuthEnabled } = require('../controllers/googleAuthController');
 const { protect } = require('../middleware/auth');
 
 console.log('Loading auth routes...');
@@ -16,15 +16,19 @@ router.post('/forgot-password', forgotPassword);
 router.put('/reset-password/:resettoken', resetPassword);
 router.post('/verify-otp', verifyOTP);
 
-// Google OAuth routes
-router.get('/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
-}));
+if (googleAuthEnabled) {
+  // Google OAuth routes
+  router.get('/google', passport.authenticate('google', {
+    scope: ['profile', 'email']
+  }));
 
-router.get('/google/callback', 
-  passport.authenticate('google', { session: false, failureRedirect: '/auth?error=google_auth_failed' }),
-  googleCallback
-);
+  router.get('/google/callback', 
+    passport.authenticate('google', { session: false, failureRedirect: '/auth?error=google_auth_failed' }),
+    googleCallback
+  );
+} else {
+  console.warn('Skipping Google OAuth routes because GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is not configured.');
+}
 
 console.log('Auth routes loaded successfully');
 
